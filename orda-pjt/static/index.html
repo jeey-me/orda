@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오르다 - 오늘의 이슈</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 사이드바 */
+        .sidebar {
+            width: 260px;
+            background: white;
+            border-right: 1px solid #e9ecef;
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+        
+        .logo-section {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .nav-menu {
+            padding: 1.5rem 0;
+        }
+        
+        .nav-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .nav-item:hover {
+            background-color: #f8f9fa;
+            border-left-color: #FF6B6B;
+        }
+        
+        .nav-item.active {
+            background-color: #fff3f3;
+            border-left-color: #FF6B6B;
+            color: #FF6B6B;
+            font-weight: 600;
+        }
+        
+        .nav-icon {
+            font-size: 1.1rem;
+            width: 20px;
+        }
+        
+        /* 메인 콘텐츠 */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        /* 페이지 헤더 */
+        .page-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .welcome-text {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .page-subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .today-date {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            display: inline-block;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+        
+        /* 이슈 목록 섹션 */
+        .issues-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* 이슈 그리드 */
+        .issues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .issue-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .issue-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+            border-color: #FF6B6B;
+        }
+        
+        .issue-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FF6B6B, #667eea, #a8e6cf);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .issue-card:hover::before {
+            opacity: 1;
+        }
+        
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .issue-number {
+            background: #f8f9fa;
+            color: #6c757d;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .issue-rank {
+            background: linear-gradient(135deg, #FF6B6B, #667eea);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .issue-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+            color: #2c3e50;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .issue-content {
+            color: #6c757d;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .issue-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .analyze-btn {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        }
+        
+        .bookmark-btn {
+            background: #ffc107;
+            color: #333;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .bookmark-btn:hover {
+            background: #ffb300;
+            transform: translateY(-1px);
+        }
+        
+        /* 로딩 상태 */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #FF6B6B;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 상태 표시 */
+        .status-bar {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+        }
+        
+        /* 알림 애니메이션 */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* 반응형 */
+        @media (max-width: 1024px) {
+            .issues-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+                padding: 1rem;
+            }
+            
+            .issues-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <!-- 사이드바 -->
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="logo">오르다</div>
+                <div class="logo-subtitle">투자 학습 플랫폼</div>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item active" onclick="navigateTo('home')">
+                    <span class="nav-icon">🏠</span>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('news')">
+                    <span class="nav-icon">📰</span>
+                    <span>News</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('sector')">
+                    <span class="nav-icon">🏭</span>
+                    <span>Sector</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('company')">
+                    <span class="nav-icon">🏢</span>
+                    <span>Company</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('mock-invest')">
+                    <span class="nav-icon">📈</span>
+                    <span>Mock Invest</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            <!-- 페이지 헤더 -->
+            <div class="page-header">
+                <div class="welcome-text">투자 학습의 시작</div>
+                <h1 class="page-title">오늘의 이슈</h1>
+                <p class="page-subtitle">
+                    AI가 선별한 주식시장 관련 핵심 이슈들을<br>
+                    분석하여 투자 인사이트를 얻어보세요
+                </p>
+                <div class="today-date" id="today-date">
+                    2025년 7월 25일 금요일
+                </div>
+            </div>
+            
+            <!-- 상태 표시 -->
+            <div class="status-bar">
+                <div class="status-info">
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <span>AI 필터링 활성화</span>
+                    </div>
+                    <div class="status-item">
+                        <span>📅 마지막 업데이트: <span id="last-update-time">10:44</span></span>
+                    </div>
+                    <div class="status-item">
+                        <span>📊 AI 선별 <span id="issue-count">5</span>개 이슈</span>
+                    </div>
+                </div>
+                <button id="refresh-issues-btn" style="
+                    padding: 0.5rem 1rem; 
+                    background: #28a745; 
+                    color: white; 
+                    border: none; 
+                    border-radius: 6px; 
+                    cursor: pointer;
+                    font-size: 0.9rem;
+                    transition: all 0.2s;
+                ">🔄 새로고침</button>
+            </div>
+            
+            <!-- 이슈 목록 -->
+            <div class="issues-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        🎯 AI 선별 주요 이슈 (<span id="grid-issue-count">5</span>개)
+                    </h2>
+                </div>
+                
+                <div class="issues-grid" id="issues-grid">
+                    <!-- 로딩 상태 -->
+                    <div class="loading" id="loading-state">
+                        <div class="spinner"></div>
+                        <p>AI가 선별한 이슈를 불러오는 중...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- RAG 분석 모달 -->
+    <div id="ai-analysis-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:2rem; border-radius:12px; max-width:1000px; width:95%; max-height:90%; overflow-y:auto; position:relative;">
+            <button onclick="closeAIAnalysisModal()" style="position:absolute; top:10px; right:15px; font-size:18px; background:none; border:none; cursor:pointer;">✖</button>
+            
+            <h2 id="modal-issue-title" style="margin-bottom:1rem; color:#2c3e50;">이슈 제목</h2>
+            <div id="modal-issue-score" style="margin-bottom:1rem; padding:0.8rem; background:#f8f9fa; border-radius:8px;">
+                <strong>📊 주식시장 관련성 점수: <span id="score-value">0</span>/10</strong>
+                <span style="margin-left:2rem; color:#666;">🔍 RAG 분석 신뢰도: <span id="rag-confidence">0</span>/10</span>
+            </div>
+            
+            <div id="modal-issue-content" style="margin-bottom:2rem; line-height:1.6; color:#555; background:#f9f9f9; padding:1rem; border-radius:8px;">이슈 내용</div>
+
+            <!-- RAG 분석 결과 -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:2rem;">
+                <!-- 관련 산업 (RAG 결과) -->
+                <div>
+                    <h3 style="color:#FF6B6B; margin-bottom:1rem;">🏭 관련 산업 (RAG 분석)</h3>
+                    <div id="modal-related-industries" style="background:#fff3f3; padding:1rem; border-radius:8px; min-height:200px;"></div>
+                </div>
+                
+                <!-- 관련 과거 이슈 (RAG 결과) -->
+                <div>
+                    <h3 style="color:#667eea; margin-bottom:1rem;">📚 관련 과거 이슈 (RAG 분석)</h3>
+                    <div id="modal-related-past-issues" style="background:#f0f4ff; padding:1rem; border-radius:8px; min-height:200px;"></div>
+                </div>
+            </div>
+
+            <!-- RAG 분석 요약 -->
+            <div style="margin-bottom:2rem;">
+                <h3 style="color:#28a745; margin-bottom:1rem;">🔍 RAG 분석 요약</h3>
+                <div id="modal-rag-summary" style="background:#f8fff9; padding:1rem; border-radius:8px; font-style:italic;">
+                    벡터 검색과 AI 분석을 통해 현재 이슈와 관련된 산업 및 과거 유사 사례를 찾아 연결했습니다.
+                </div>
+            </div>
+
+            <!-- 분석 메타데이터 -->
+            <div style="border-top:1px solid #eee; padding-top:1rem; color:#666; font-size:0.9rem;">
+                <strong>분석 정보:</strong> 
+                <span>벡터 유사도 검색 + GPT-4o AI 분석</span> | 
+                <span>Pinecone 벡터DB 활용</span> | 
+                <span id="analysis-timestamp">분석 시간</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let currentIssues = [];
+        let isRefreshing = false;
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTodayDate();
+            loadCurrentIssues();
+            setupRefreshButton();
+        });
+
+        // 오늘 날짜 업데이트
+        function updateTodayDate() {
+            const today = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            const timeString = today.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+            const dateString = today.toLocaleDateString('ko-KR', options);
+            
+            document.getElementById('today-date').textContent = `${dateString} ${timeString}`;
+            document.getElementById('last-update-time').textContent = timeString;
+        }
+
+        // AI 선별 이슈 로드
+        async function loadCurrentIssues() {
+            if (isRefreshing) return;
+            
+            const grid = document.getElementById('issues-grid');
+            const loading = document.getElementById('loading-state');
+            
+            console.log('🔄 AI 선별 이슈 로딩 중...');
+            isRefreshing = true;
+            
+            try {
+                // 로딩 상태 표시
+                if (loading) {
+                    loading.style.display = 'block';
+                    loading.innerHTML = `
+                        <div style="text-align: center; padding: 2rem;">
+                            <div style="border: 4px solid #f3f3f3; border-top: 4px solid #FF6B6B; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+                            <p>🤖 AI가 선별한 이슈를 불러오는 중...</p>
+                            <small style="color: #666;">주식시장 관련성 분석 완료된 데이터</small>
+                        </div>
+                    `;
+                }
+                
+                // API 호출
+                const response = await fetch('/api/today-issues');
+                console.log('📡 API 응답 상태:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                console.log('📊 API 응답 데이터:', result);
+                
+                if (result.success && result.data && Array.isArray(result.data.selected_issues)) {
+                    // AI 데이터를 화면 표시용으로 변환
+                    currentIssues = result.data.selected_issues.map((issue, index) => ({
+                        ...issue, // 원본 AI 데이터 모두 보존
+                        이슈번호: issue.이슈번호 || (index + 1),
+                        제목: issue.제목 || `이슈 ${index + 1}`,
+                        내용: issue.원본내용 || issue.내용 || '내용 없음',
+                        카테고리: issue.카테고리 || '미분류',
+                        추출시간: issue.추출시간 || new Date().toISOString()
+                    }));
+                    
+                    console.log(`✅ ${currentIssues.length}개 AI 선별 이슈 로드`);
+                    
+                    // 로딩 숨기고 데이터 표시
+                    if (loading) loading.style.display = 'none';
+                    displayIssues(currentIssues);
+                    
+                    // 카운트 업데이트
+                    updateIssueCounts(currentIssues.length);
+                    
+                    // 성공 알림
+                    showNotification(`✅ AI가 선별한 ${currentIssues.length}개 핵심 이슈를 가져왔습니다!`, 'success');
+                    
+                } else {
+                    throw new Error('API 응답 데이터 구조가 올바르지 않습니다.');
+                }
+                
+            } catch (error) {
+                console.error('❌ API 호출 실패:', error);
+                
+                // 에러 표시
+                if (loading) {
+                    loading.innerHTML = `
+                        <div style="text-align: center; padding: 2rem;">
+                            <p style="color: #dc3545; margin-bottom: 1rem;">⚠️ AI 선별 데이터를 불러올 수 없습니다.</p>
+                            <p style="color: #666; margin-bottom: 1rem;">서버와의 연결을 확인하세요.</p>
+                            <button onclick="loadCurrentIssues()" style="background: #FF6B6B; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer;">🔄 다시 시도</button>
+                        </div>
+                    `;
+                }
+                
+                showNotification('❌ 데이터를 불러올 수 없습니다. 다시 시도해주세요.', 'error');
+            } finally {
+                isRefreshing = false;
+            }
+        }
+
+        // 이슈 카운트 업데이트
+        function updateIssueCounts(count) {
+            const issueCountElements = document.querySelectorAll('#issue-count, #grid-issue-count');
+            issueCountElements.forEach(el => {
+                if (el) el.textContent = count;
+            });
+        }
+
+        // 이슈 목록 표시
+        function displayIssues(issues) {
+            const grid = document.getElementById('issues-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+
+            issues.forEach((issue, index) => {
+                const issueCard = document.createElement('div');
+                issueCard.className = 'issue-card';
+                
+                // AI 점수에 따른 색상 결정
+                const score = issue.종합점수 || 0;
+                let scoreColor = '#28a745'; // 초록색
+                if (score < 7) scoreColor = '#ffc107'; // 노란색
+                if (score < 5) scoreColor = '#dc3545'; // 빨간색
+                
+                // 내용 요약 (너무 길면 자름)
+                const displayContent = getDisplayContent(issue);
+                
+                issueCard.innerHTML = `
+                    <div class="issue-header">
+                        <div class="issue-rank">TOP ${issue.rank || index + 1}</div>
+                        <div class="issue-number" style="background: ${scoreColor}; color: white;">
+                            ${score}/10
+                        </div>
+                    </div>
+                    <div class="issue-title">${issue.제목}</div>
+                    <div class="issue-content">${displayContent}</div>
+                    <div class="issue-footer"> 
+                        <button class="analyze-btn" onclick="showAIAnalysisModal(${index})">
+                            🤖 AI 분석 보기
+                        </button>
+                        <button class="bookmark-btn" onclick="bookmarkIssue(${index})">
+                            ⭐ 저장
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(issueCard);
+            });
+            
+            console.log(`🎨 ${issues.length}개 AI 선별 이슈 카드 렌더링 완료`);
+        }
+
+        // 표시할 내용 결정 (제목에 맞는 적절한 요약 생성)
+        function getDisplayContent(issue) {
+            const title = issue.제목;
+            const originalContent = issue.원본내용 || issue.내용 || '';
+            
+            // 제목의 키워드 추출
+            const titleKeywords = extractKeywords(title);
+            
+            // 원본 내용에서 제목과 관련된 부분 찾기
+            const relevantSentences = findRelevantSentences(originalContent, titleKeywords);
+            
+            if (relevantSentences.length > 0) {
+                return relevantSentences.slice(0, 3).join(' ').substring(0, 150) + '...';
+            }
+            
+            // 관련 내용을 찾지 못한 경우 기본 요약
+            return originalContent.substring(0, 150) + '...';
+        }
+
+        // 키워드 추출
+        function extractKeywords(title) {
+            return title.split(/[\s,·]+/).filter(word => word.length > 1);
+        }
+
+        // 관련 문장 찾기
+        function findRelevantSentences(content, keywords) {
+            const sentences = content.split(/[.!?]\s+/);
+            return sentences.filter(sentence => {
+                return keywords.some(keyword => sentence.includes(keyword));
+            });
+        }
+
+ // AI 분석 모달 표시 (RAG 결과 포함 버전) - 완전한 함수
+        function showAIAnalysisModal(issueIndex) {
+            const issue = currentIssues[issueIndex];
+            if (!issue) {
+                showNotification('선택한 이슈를 찾을 수 없습니다.', 'error');
+                return;
+            }
+
+            const modal = document.getElementById('ai-analysis-modal');
+            
+            // 기본 정보
+            document.getElementById('modal-issue-title').textContent = issue.제목;
+            document.getElementById('modal-issue-content').textContent = issue.원본내용 || issue.내용;
+            document.getElementById('score-value').textContent = issue.종합점수 || issue.주식시장_관련성_점수 || 'N/A';
+            document.getElementById('rag-confidence').textContent = issue.RAG분석신뢰도 || 'N/A';
+            
+            // 관련 산업 (RAG 결과)
+            const industriesDiv = document.getElementById('modal-related-industries');
+            const relatedIndustries = issue.관련산업 || [];
+            
+            if (relatedIndustries.length > 0) {
+                industriesDiv.innerHTML = relatedIndustries.map((industry, idx) => 
+                    `<div style="margin-bottom:1rem; padding:0.8rem; background:white; border-radius:6px; border-left:4px solid #FF6B6B;">
+                        <div style="font-weight:bold; color:#FF6B6B; margin-bottom:0.5rem;">
+                            ${idx + 1}. ${industry.name} 
+                            <span style="font-size:0.9rem; color:#666; font-weight:normal;">(점수: ${industry.final_score}/10)</span>
+                        </div>
+                        <div style="color:#666; font-size:0.9rem; margin-bottom:0.5rem;">
+                            <strong>AI 분석 이유:</strong> ${industry.ai_reason}
+                        </div>
+                        <div style="color:#999; font-size:0.8rem;">
+                            벡터 유사도: ${industry.vector_similarity}%
+                        </div>
+                    </div>`
+                ).join('');
+            } else {
+                industriesDiv.innerHTML = '<div style="color:#666; text-align:center; padding:2rem;">관련 산업 정보가 없습니다.<br><small>RAG 분석이 완료되지 않았을 수 있습니다.</small></div>';
+            }
+            
+            // 관련 과거 이슈 (RAG 결과)
+            const pastIssuesDiv = document.getElementById('modal-related-past-issues');
+            const relatedPastIssues = issue.관련과거이슈 || [];
+            
+            if (relatedPastIssues.length > 0) {
+                pastIssuesDiv.innerHTML = relatedPastIssues.map((pastIssue, idx) => 
+                    `<div style="margin-bottom:1rem; padding:0.8rem; background:white; border-radius:6px; border-left:4px solid #667eea;">
+                        <div style="font-weight:bold; color:#667eea; margin-bottom:0.5rem;">
+                            ${idx + 1}. ${pastIssue.name}
+                            <span style="font-size:0.9rem; color:#666; font-weight:normal;">(점수: ${pastIssue.final_score}/10)</span>
+                        </div>
+                        <div style="color:#666; font-size:0.9rem; margin-bottom:0.5rem;">
+                            <strong>유사성 이유:</strong> ${pastIssue.ai_reason}
+                        </div>
+                        <div style="color:#999; font-size:0.8rem;">
+                            발생 기간: ${pastIssue.period || 'N/A'} | 벡터 유사도: ${pastIssue.vector_similarity}%
+                        </div>
+                    </div>`
+                ).join('');
+            } else {
+                pastIssuesDiv.innerHTML = '<div style="color:#666; text-align:center; padding:2rem;">관련 과거 이슈가 없습니다.<br><small>RAG 분석이 완료되지 않았을 수 있습니다.</small></div>';
+            }
+            
+            // RAG 분석 요약
+            const ragSummaryDiv = document.getElementById('modal-rag-summary');
+            const industryCount = relatedIndustries.length;
+            const pastIssueCount = relatedPastIssues.length;
+            const ragConfidence = issue.RAG분석신뢰도 || 0;
+            
+            let summaryText = `벡터 검색을 통해 관련 산업 ${industryCount}개와 과거 유사 이슈 ${pastIssueCount}개를 발견했습니다.`;
+            
+            if (ragConfidence > 0) {
+                if (ragConfidence >= 8) {
+                    summaryText += ' 매우 높은 신뢰도로 관련성이 확인되었습니다.';
+                } else if (ragConfidence >= 6) {
+                    summaryText += ' 높은 신뢰도로 관련성이 확인되었습니다.';
+                } else if (ragConfidence >= 4) {
+                    summaryText += ' 보통 수준의 관련성이 확인되었습니다.';
+                } else {
+                    summaryText += ' 낮은 신뢰도이므로 참고용으로만 활용하세요.';
+                }
+            }
+            
+            ragSummaryDiv.textContent = summaryText;
+            
+            // 분석 시간
+            document.getElementById('analysis-timestamp').textContent = 
+                `분석 시간: ${issue.추출시간 ? new Date(issue.추출시간).toLocaleString('ko-KR') : '정보 없음'}`;
+            
+            modal.style.display = 'flex';
+        }
+
+        // 모달 닫기
+        function closeAIAnalysisModal() {
+            const modal = document.getElementById('ai-analysis-modal');
+            modal.style.display = 'none';
+        }
+
+        // 새로고침 버튼 설정
+        function setupRefreshButton() {
+            const refreshBtn = document.getElementById('refresh-issues-btn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', loadCurrentIssues);
+                refreshBtn.addEventListener('mouseenter', function() {
+                    this.style.background = '#218838';
+                });
+                refreshBtn.addEventListener('mouseleave', function() {
+                    this.style.background = '#28a745';
+                });
+            }
+        }
+
+        // 이슈 즐겨찾기
+        function bookmarkIssue(index) {
+            const issue = currentIssues[index];
+            
+            if (!issue) {
+                showNotification('⚠️ 선택한 이슈를 찾을 수 없습니다.', 'error');
+                return;
+            }
+            
+            try {
+                const bookmarks = JSON.parse(localStorage.getItem('orda_ai_bookmarks') || '[]');
+                
+                // 중복 체크
+                const isDuplicate = bookmarks.some(bookmark => 
+                    bookmark.title === issue.제목 && bookmark.rank === issue.rank
+                );
+                
+                if (isDuplicate) {
+                    showNotification('이미 저장된 이슈입니다.', 'warning');
+                    return;
+                }
+                
+                const bookmark = {
+                    id: `ai_${Date.now()}`,
+                    title: issue.제목,
+                    content: issue.원본내용 || issue.내용,
+                    score: issue.종합점수,
+                    rank: issue.rank,
+                    category: issue.카테고리,
+                    saved_at: new Date().toISOString()
+                };
+                
+                bookmarks.push(bookmark);
+                localStorage.setItem('orda_ai_bookmarks', JSON.stringify(bookmarks));
+                showNotification(`⭐ "${issue.제목}"을(를) 즐겨찾기에 추가했습니다!`, 'success');
+                
+            } catch (e) {
+                console.error('즐겨찾기 저장 실패:', e);
+                showNotification('즐겨찾기 저장에 실패했습니다.', 'error');
+            }
+        }
+
+        // 페이지 네비게이션
+        function navigateTo(page) {
+            const pages = {
+                'home': '/static/index.html',
+                'news': '/static/news.html', 
+                'sector': '/static/sector.html',
+                'company': '/static/company.html',
+                'mock-invest': '/static/mock-invest.html'
+            };
+            
+            if (page !== 'home') {
+                console.log(`🧭 페이지 이동: ${page}`);
+                window.location.href = pages[page];
+            }
+        }
+
+        // 알림 표시
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: '#4CAF50',
+                warning: '#ff9800', 
+                error: '#f44336',
+                info: '#2196F3'
+            };
+            
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; 
+                top: 20px; 
+                right: 20px; 
+                background: ${colors[type] || colors.info}; 
+                color: white; 
+                padding: 15px 20px; 
+                border-radius: 8px; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 1000;
+                font-weight: 500;
+                max-width: 400px;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">×</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 5초 후 자동 제거
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // 개발자 도구 디버그 함수
+        window.debugOrdaAPI = {
+            loadIssues: loadCurrentIssues,
+            currentIssues: () => currentIssues,
+            testAPI: async () => {
+                const response = await fetch('/api/today-issues');
+                return await response.json();
+            },
+            showModal: showAIAnalysisModal,
+            generateMockData: () => {
+                // 테스트용 목 데이터 생성
+                return [
+                    {
+                        rank: 1,
+                        이슈번호: 1,
+                        카테고리: "경제",
+                        제목: "현대차·SK하이닉스 2분기 엇갈린 실적",
+                        종합점수: 9.2,
+                        직접기업영향: 9,
+                        정책영향: 7,
+                        시장심리: 8,
+                        거시경제: 6,
+                        산업트렌드: 8,
+                        주된영향분야: ["자동차", "반도체"],
+                        예상영향방향: "부정적",
+                        영향시기: "즉시",
+                        선별이유: "현대차와 SK하이닉스의 실적 차이는 투자자들에게 큰 신호를 줄 수 있으며, 특히 자동차 산업과 반도체 산업에 대한 시장의 신뢰도에 영향을 미칠 것으로 예상됨.",
+                        예상시장반응: "자동차 관련 주식은 하락할 가능성이 높고, 반도체 관련 주식은 긍정적인 반응을 보일 것으로 예상됨.",
+                        원본내용: "현대자동차는 2분기 역대 최대 매출을 기록했으나 미국 관세 영향으로 영업이익이 감소했다. 반면 SK하이닉스는 AI 반도체 수요 증가로 분기 기준 최대 실적을 달성했다.",
+                        추출시간: "2025-07-25T10:33:28.325949",
+                        고유ID: "경제_1"
+                    }
+                ];
+            }
+        };
+        
+        console.log('🎯 오르다 HOME 페이지 로드 완료 (수정된 버전)');
+        console.log('💡 개발자 도구에서 window.debugOrdaAPI로 테스트 가능');
+        console.log('🔧 문제 해결: AI 분석 모달 함수 호출 오류 수정');
+    </script>
+
+</body>
+</html>
